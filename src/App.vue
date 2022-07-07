@@ -1,81 +1,89 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+<script>
+import { v4 as uuid } from "uuid";
+import { SideNav, AllNotes, FavouriteNotes } from "./components";
+
+export default {
+  data() {
+    return {
+      message: "Hello world",
+      currentTab: "All Notes",
+      allNotes: JSON.parse(localStorage.getItem("notes")) || [],
+    };
+  },
+  components: {
+    SideNav,
+    AllNotes,
+    FavouriteNotes,
+  },
+  methods: {
+    changeTab(tab) {
+      switch (tab) {
+        case "NOTES":
+          this.currentTab = "All Notes";
+          break;
+        case "FAVOURITES":
+          this.currentTab = "Favourites";
+          break;
+        default:
+          this.currentTab = "All Notes";
+      }
+    },
+    addNote(newNote) {
+      console.log({ newNote });
+      this.allNotes.push({ id: uuid(), text: newNote, isFavourite: false });
+      localStorage.setItem("notes", JSON.stringify(this.allNotes));
+    },
+    toggleFavourites(id) {
+      console.log(id);
+      this.allNotes = this.allNotes.map((note) =>
+        note.id === id ? { ...note, isFavourite: !note.isFavourite } : note
+      );
+      localStorage.setItem("notes", JSON.stringify(this.allNotes));
+    },
+    deleteNote(id) {
+      this.allNotes = this.allNotes.filter((note) => note.id !== id);
+      localStorage.setItem("notes", JSON.stringify(this.allNotes));
+    },
+  },
+  watch: {
+    currentTab(newTab) {
+      console.log(newTab);
+    },
+  },
+};
+
+/**
+ * Make the following components:
+ * 1. Sidenav - have 2 options
+ *    a. All notes
+ *    b. Favourite Notes
+ * 2. Main page - Will show the data depending on the sidenav option chosen
+ * 3. In the All notes section -
+ *  a. Show a create note component
+ *  b. Below the show note component show all the notes either added to favourites or not
+ * 4. In the Favourite Notes section filter and show only those notes which are added to favourites
+ * 5. Save the notes in the localstorage such that the app persists the state on reloads even
+ * Design system : tailwindcss
+ * Icons library: to be decided while trying all that are available
+ *
+ */
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <div class="w-screen h-screen flex">
+    <SideNav :currentTab="currentTab" @changeTab="changeTab" />
+    <AllNotes
+      v-if="currentTab === 'All Notes'"
+      :allNotes="allNotes"
+      @add-note="addNote"
+      @toggle-favourite="toggleFavourites"
+      @delete-note="deleteNote"
+    />
+    <FavouriteNotes
+      v-else
+      :allNotes="allNotes"
+      @toggle-favourite="toggleFavourites"
+      @delete-note="deleteNote"
+    />
+  </div>
 </template>
-
-<style>
-@import './assets/base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  font-weight: normal;
-}
-
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-}
-</style>
