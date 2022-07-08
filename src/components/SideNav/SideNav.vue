@@ -1,12 +1,12 @@
 <script>
+import { store } from "../../store";
+
 export default {
   props: ["currentTab"],
-  emits: ["changeTab"],
   methods: {
- 
-  },
-  mounted() {
-    console.log(this.currentTab);
+    changeTab(tab) {
+      store.commit("changeTab", { tab });
+    },
   },
 };
 </script>
@@ -16,7 +16,7 @@ export default {
     <header class="font-bold text-center px-2">Vue Notes</header>
     <div class="w-full mt-10 flex flex-col items-start">
       <button
-        @click="$emit('changeTab', 'NOTES')"
+        @click="() => changeTab('NOTES')"
         class="w-full py-3 transition-colors"
         :class="[
           currentTab === 'All Notes' && 'bg-blue-600',
@@ -26,7 +26,7 @@ export default {
         All Notes
       </button>
       <button
-        @click="$emit('changeTab', 'FAVOURITES')"
+        @click="() => changeTab('FAVOURITES')"
         class="w-full py-3 transition-colors"
         :class="[
           currentTab === 'Favourites' && 'bg-blue-600',

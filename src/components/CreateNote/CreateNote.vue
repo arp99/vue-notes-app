@@ -1,16 +1,15 @@
 <script>
+import { store } from "../../store";
+
 export default {
-  emits: ["add-note"],
   data() {
     return {
-      createNoteState: "Create Note",
       currentNote: "",
     };
   },
   methods: {
     onAddNoteClicked() {
-      console.log(" add note emiited");
-      this.$emit("add-note", this.currentNote);
+      store.commit("addNote", { newNote: this.currentNote });
       this.currentNote = "";
     },
   },

@@ -1,17 +1,21 @@
 <script>
 import { BIconHeart, BIconHeartFill, BIconTrash } from "bootstrap-icons-vue";
+import { store } from "../../store";
+
 export default {
   props: ["note"],
-  emits: ["toggle-favourite", "delete-note"],
   components: {
     BIconHeart,
     BIconHeartFill,
     BIconTrash,
   },
-  data() {
-    return {
-      viewNoteState: "View note",
-    };
+  methods: {
+    toggleFavourite(id) {
+      store.commit("toggleFavourites", { id });
+    },
+    deleteNote(id){
+      store.commit("deleteNote", { id })
+    }
   },
 };
 </script>
@@ -26,19 +30,19 @@ export default {
       <BIconHeartFill
         role="button"
         class="text-blue-600 text-xl"
-        @click="$emit('toggle-favourite', note.id)"
+        @click="() => toggleFavourite(note.id)"
         v-if="note.isFavourite"
       />
       <BIconHeart
         role="button"
         class="text-blue-600 text-xl"
-        @click="$emit('toggle-favourite', note.id)"
+        @click="() => toggleFavourite(note.id)"
         v-else
       />
       <BIconTrash
         role="button"
         class="text-blue-600 text-xl"
-        @click="$emit('delete-note', note.id)"
+        @click="() => deleteNote(note.id)"
       />
     </div>
   </div>

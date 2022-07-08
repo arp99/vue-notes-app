@@ -1,54 +1,15 @@
 <script>
-import { v4 as uuid } from "uuid";
 import { SideNav, AllNotes, FavouriteNotes } from "./components";
+import { mapGetters } from "vuex";
 
 export default {
-  data() {
-    return {
-      message: "Hello world",
-      currentTab: "All Notes",
-      allNotes: JSON.parse(localStorage.getItem("notes")) || [],
-    };
-  },
   components: {
     SideNav,
     AllNotes,
     FavouriteNotes,
   },
-  methods: {
-    changeTab(tab) {
-      switch (tab) {
-        case "NOTES":
-          this.currentTab = "All Notes";
-          break;
-        case "FAVOURITES":
-          this.currentTab = "Favourites";
-          break;
-        default:
-          this.currentTab = "All Notes";
-      }
-    },
-    addNote(newNote) {
-      console.log({ newNote });
-      this.allNotes.push({ id: uuid(), text: newNote, isFavourite: false });
-      localStorage.setItem("notes", JSON.stringify(this.allNotes));
-    },
-    toggleFavourites(id) {
-      console.log(id);
-      this.allNotes = this.allNotes.map((note) =>
-        note.id === id ? { ...note, isFavourite: !note.isFavourite } : note
-      );
-      localStorage.setItem("notes", JSON.stringify(this.allNotes));
-    },
-    deleteNote(id) {
-      this.allNotes = this.allNotes.filter((note) => note.id !== id);
-      localStorage.setItem("notes", JSON.stringify(this.allNotes));
-    },
-  },
-  watch: {
-    currentTab(newTab) {
-      console.log(newTab);
-    },
+  computed: {
+    ...mapGetters(["getNotes", "getTab"]),
   },
 };
 
@@ -71,19 +32,8 @@ export default {
 
 <template>
   <div class="w-screen h-screen flex">
-    <SideNav :currentTab="currentTab" @changeTab="changeTab" />
-    <AllNotes
-      v-if="currentTab === 'All Notes'"
-      :allNotes="allNotes"
-      @add-note="addNote"
-      @toggle-favourite="toggleFavourites"
-      @delete-note="deleteNote"
-    />
-    <FavouriteNotes
-      v-else
-      :allNotes="allNotes"
-      @toggle-favourite="toggleFavourites"
-      @delete-note="deleteNote"
-    />
+    <SideNav :currentTab="getTab" />
+    <AllNotes v-if="getTab === 'All Notes'" :allNotes="getNotes" />
+    <FavouriteNotes v-else />
   </div>
 </template>
